@@ -35,21 +35,32 @@ private:
     void first_read_record_data(fstream& file, AddressType& pos, char& ref);
     int number_of_records(fstream& file, FileID FileID);
     int number_of_records(string filename, FileID FileID);
-    static bool compare_records(Record& r1, Record& r2);
-    bool is_empty(FileID FileID);
-    bool is_full();
+    static bool compare_records(Record& r1, Record& r2){
+        return r1==r2 ;
+    };
+    bool is_empty(FileID FileID){
+        return (FileID == DATAFILE)? (!ftell(DATAFILE_DP))? true:false : (!ftell(AUXFILE_DP))? true:false ;
+    };
+    bool is_full(){
+        size_t capacity;
+        while(DATAFILE_DP.eof()){ ++capacity; }
+        return capacity<=MAX_CAPACITY ;
+    };
     bool is_removable();
     void read_status_for_deleted_record(fstream&file, bool& status);
     void write_status_for_deleted_record(fstream&file, bool status);
 public:
-    SequentialFile(string DATAFILE_DP_, string AUXFILE_DP_);
-    void insert_all(vector<Record> &record);
+    SequentialFile(string DATAFILE_DP_, string AUXFILE_DP_){
+        DATAFILE_DP=DATAFILE_DP_;
+        AUXFILE_DP=DATAFILE_DP_;
+    };
+    //void insert_all(vector<Record> &record);
     void add_record(Record record);
-    pair<RecordData,RecordData> sequential_search(Key key);
+    //pair<RecordData,RecordData> sequential_search(Key key);
     vector<Record> search_record(Key key);
     vector<Record> search_per_range(Key start, Key end);
     void remove_record(Key key);
-    vector<Record> load();
+    //vector<Record> load();
 };
 
 #endif // SEQUENTIAL_H
