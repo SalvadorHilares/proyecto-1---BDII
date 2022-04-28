@@ -60,9 +60,9 @@ class ExtendibleHashFile{
         ExtendibleHashFile(string _filename){
             this->filename = "hash.dat";
             //transformarlo al formato visto en clase sin guardarlo en memoria secundaria, solo para interactuar usando la RAM
-            ifstream file(_filename, ios::binary | ios::in);
+            ifstream file(_filename, ios::in);
             string linea = "";
-            char delimitador = ',';
+            string delimitador = ",";
             getline(file,linea);
             while(getline(file,linea)){
                 Record record = Record();
