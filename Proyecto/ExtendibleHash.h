@@ -3,7 +3,6 @@
 #include <vector>
 #include <bitset>
 #define MAX_B 5
-#define D_global 8
 using namespace std;
 
 struct Record{
@@ -62,11 +61,12 @@ struct Bucket{
 	    return 1;
     }
 	bool search(int ranking){
-        for(int i = 0; i < records.size(); i++)
+        for(int i = 0; i < records.size(); i++){
 		    if (records.at(i).ranking == ranking){
 			    records.at(i).showData();
                 return true;
             }
+        }
 	    return false;
     }
 	void copy(vector <Record> temp){
@@ -89,9 +89,11 @@ class ExtendibleHashFile{
         string filename;
         hash<T> str_hash;
         vector <Bucket> buckets;
+        int depthoverf;
     public:
         ExtendibleHashFile(string _filename){
-            this->filename = "hash.dat";
+            this->filename = filename;
+            depthoverf=8;
             //transformarlo al formato visto en clase sin guardarlo en memoria secundaria, solo para interactuar usando la RAM
             ifstream file(_filename, ios::in);
             string linea = "";
@@ -113,15 +115,22 @@ class ExtendibleHashFile{
                 record.previous_point_score = stod(campos[5]);
                 record.symbol_change = linea[0];
 
-                write_record(record);
+                add(record);
             }
             file.close();
         }
         void search(T key);     //---
-        vector<Record> rangeSearch(T begin_key, T end_key); //---
+        void rangeSearch(T begin_key, T end_key); //---
         void add(Record record); 
         void remove(T key); //---
         ~ExtendibleHashFile(){}
+
+
+        //
+        	void split(int bucket_num);
+            void reinsert(int bucket_num);
+            void Doubledirectory();
+        //
 };
 
 template<typename T>
@@ -136,19 +145,17 @@ void ExtendibleHashFile<T>::search(T key){
 
 
 template<typename T>
-vector<Record> ExtendibleHashFile<T>::rangeSearch(T begin_key, T end_key){
-    T key_aux=key;
+void ExtendibleHashFile<T>::rangeSearch(T begin_key, T end_key){
+    T key_aux=begin_key;
     size_t begin_hashcode = str_hash(begin_key);
     size_t end_hashcode = str_hash(end_key);
     for(size_t i=begin_hashcode;i<end_hashcode;i++){
         bool encontrado = buckets[i].search(key_aux);
         if (!encontrado)
-        cout << key << "El registro no existe" << endl;
-        key_aux++
+        cout << key_aux << "El registro no existe" << endl;
+        key_aux++;
     }
-    size_t begin_hashcode = str_hash(begin_key);
-    size_t end_hashcode = str_hash(end_key);
-    throw("Falta implementar");
+
 }
 
 template<typename T>
@@ -160,12 +167,65 @@ void ExtendibleHashFile<T>::remove(T key){
 
 
 template<typename T>
+void ExtendibleHashFile<T> :: Doubledirectory(){
+	for(int i = 0; i < (1 << depthoverf); i++)
+		buckets.push_back(buckets.at(i));
+    depthoverf++;
+	//cout << "line 94 " << this->globaldepth << endl;;
+}
+
+template<typename T>
+void ExtendibleHashFile<T> :: reinsert(int bucket_num){
+	vector <Record> temp;
+	buckets[bucket_num].copy(temp);
+	for(int i = 0; i < temp.size(); i++){
+		Record key = temp.at(i);
+		size_t bucket_num  = str_hash(key.ranking);
+		//cout << "new bucket_num" << bucket_num << endl;
+		int banderita = buckets[bucket_num].insert(key);
+		if (banderita == -1){
+			split(bucket_num);
+			buckets[bucket_num].insert(key);
+		}
+	}
+}
+
+template<typename T>
+void ExtendibleHashFile<T> :: split(int bucket_num){
+	int localdepth = buckets[bucket_num].depth;
+	//cout << globaldepth << " " << localdepth << endl;
+	if (depthoverf == localdepth)
+		Doubledirectory();
+	int mirrorindex = bucket_num ^ (1 << localdepth);
+	buckets[bucket_num].depth++;
+	localdepth++;
+	//cout << buckets[bucket_num]->getdepth() << endl;
+	buckets[mirrorindex] = Bucket();
+    buckets[mirrorindex].depth=localdepth;
+    int num = 1 << localdepth;
+	for(int i = mirrorindex + num; i < (1 << depthoverf); i += num)
+		buckets[i] = buckets[mirrorindex];
+	for(int i = mirrorindex - num; i >=0 ; i -= num)
+		buckets[i] = buckets[mirrorindex];
+	reinsert(bucket_num);
+}
+
+
+
+
+
+
+
+
+
+template<typename T>
 void ExtendibleHashFile<T>::add(Record record){
     size_t hashcode = str_hash(record.ranking);
-    int temp = buckets[bucket_num]->insert(key);
+    int temp = buckets[hashcode].insert(record);
     if (temp == -1){
-        cout << "splitting bucketnum " << bucket_num << endl;
-
+        cout << "splitting bucketnum " << hashcode << endl;
+        split(hashcode);
+		add(record);
 	}
 	else if (temp == 0){
 		cout << "La llave ya existe" << endl;
