@@ -16,13 +16,13 @@ struct Record{
     char symbol_change;
     
     void showData(){
-        cout<<"Ranking: "<<ranking<<endl;
-        cout<<"Club name: "<<club_name<<endl;
-        cout<<"Country: "<<country<<endl;
-        cout<<"Point score: "<<point_score<<endl;
-        cout<<"One year change: "<<one_year_change<<endl;
-        cout<<"Previous point score: "<<previous_point_score<<endl;
-        cout<<"Symbol change: "<<symbol_change<<endl;
+        cout<<"\tRanking: "<<ranking<<endl;
+        cout<<"\tClub name: "<<club_name<<endl;
+        cout<<"\tCountry: "<<country<<endl;
+        cout<<"\tPoint score: "<<point_score<<endl;
+        cout<<"\tOne year change: "<<one_year_change<<endl;
+        cout<<"\tPrevious point score: "<<previous_point_score<<endl;
+        cout<<"\tSymbol change: "<<symbol_change<<endl;
         cout<<"------------------------------------------------"<<endl;
     }
 };
