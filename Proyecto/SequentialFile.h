@@ -1,11 +1,9 @@
-#ifndef SEQUENTIAL_H
-#define SEQUENTIAL_H
-
 #include "Utils.h"
+#include "record.h"
 
 #define AddressType int32_t
 #define INVALID 'x'
-#define MAX_CAPACITY 5
+#define MAX_CAPACITY 1000
 
 using namespace std;
 
@@ -45,8 +43,8 @@ private:
         file.seekp(0,ios::beg);
         file.write((char*)&pos, sizeof(AddressType));
         file.write((char*)&ref, sizeof(char));
-        cout<<"SUCCES";
     }
+
     void insert_with_sequential_search(Record& record){
         fstream dataFile(DATAFILE_DP,ios::binary | ios::in | ios::out);
         fstream auxFile(AUXFILE_DP,ios::binary | ios::in | ios::out);
@@ -89,6 +87,8 @@ private:
         auxFile.close();
         dataFile.close();
     }
+
+
     void read_record(AddressType pos, fstream& file, Record& record, FileID FileID){
         if (!file.is_open())
             throw out_of_range("File not open @ read_record");
@@ -131,14 +131,11 @@ private:
         return n;
     }
     static bool compare_records(Record& r1, Record& r2){
-        return r1<r2 ;
+        return r1 < r2;
     }
     bool is_empty(FileID FileID){
-        if (FileID == DATAFILE){
-            cout<<number_of_records(this->DATAFILE_DP,DATAFILE)<<" ";
+        if (FileID == DATAFILE)
             return number_of_records(this->DATAFILE_DP,DATAFILE) == 0;
-
-        }   
         else if(FileID == AUXFILE)
             return number_of_records(this->AUXFILE_DP,AUXFILE) == 0;
         else
@@ -171,16 +168,9 @@ private:
     }
 public:
     SequentialFile(string DATAFILE_DP_, string AUXFILE_DP_){
-        DATAFILE_DP=DATAFILE_DP_;
-        AUXFILE_DP=DATAFILE_DP_;
-    };
-    /*//void insert_all(vector<Record> &record);
-    void add_record(Record record);
-    //pair<RecordData,RecordData> sequential_search(Key key);
-    vector<Record> search_record(Key key);
-    vector<Record> search_per_range(Key start, Key end);
-    void remove_record(Key key);
-    //vector<Record> load();*/
+        this->DATAFILE_DP = DATAFILE_DP_;
+        this->AUXFILE_DP = AUXFILE_DP_;
+    }
     void insert_all(vector<Record> &record){
         if (is_empty(DATAFILE)){
             sort(record.begin(), record.end(),compare_records);
@@ -215,7 +205,6 @@ public:
             return;
         }
         if (is_full()){
-            
             auto records = load();
 
             remove(this->DATAFILE_DP.c_str());
@@ -270,7 +259,6 @@ public:
             curr_pos = curr_record.nextDel;
             curr_ref = curr_record.ref;
         }
-        
         return  {RecordData(prev_pos,prev_ref,prev_record),RecordData(curr_pos,curr_ref,curr_record)};
     }
     vector<Record> search_record(Key key){
@@ -422,5 +410,3 @@ public:
         return records;
     }
 };
-
-#endif // SEQUENTIAL_H
