@@ -37,4 +37,5 @@ El sequential file es un método que mantiene ordenado los records físicamente 
 - Los records eliminados lo ponemos con -1 y actualizamos el archivo.
 - Cuando termine de ejecutarse el programa, reorganizamos el archivo principal llamando al DESTRUCTOR.
 ## Resultados experimentales
+![](https://i.imgur.com/dMesSbD.png)
 ## Link del video 
