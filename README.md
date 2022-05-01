@@ -38,4 +38,11 @@ El sequential file es un método que mantiene ordenado los records físicamente 
 - Cuando termine de ejecutarse el programa, reorganizamos el archivo principal llamando al DESTRUCTOR.
 ## Resultados experimentales
 ![](https://i.imgur.com/dMesSbD.png)
-## Link del video 
+## Link del video
+## Cuadro de participación
+|Lista de actividades realizadas|Responsable|Nota|
+|-------------------------------|-----------|----|
+|Escritura del informe          |SalvadorH. |    |
+|Codeo del Extendible Hash      |SH. y E.Car|    |
+|Codeo del Sequential File      |Neft. Calix|    |
+|Codeo del menu en el Terminal  |Eros Car.  |    |
